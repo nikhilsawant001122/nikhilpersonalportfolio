@@ -21,6 +21,7 @@
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
@@ -123,6 +124,78 @@
     
     .back-btn:hover {
       text-decoration: underline;
+    }
+    
+    /* Gallery Modal Styles */
+    .custom-gallery-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .gallery-close {
+      position: absolute;
+      top: 20px;
+      right: 35px;
+      color: #f1f1f1;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10001;
+    }
+    .gallery-close:hover {
+      color: #bbb;
+    }
+    .gallery-container {
+      width: 95%;
+      max-width: 1200px;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .gallery-main {
+      width: 100%;
+      height: 85%;
+      margin-bottom: 10px;
+    }
+    .gallery-main .swiper-slide {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .gallery-main img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .gallery-thumbs {
+      width: 100%;
+      height: 18%;
+      box-sizing: border-box;
+      padding: 10px 0;
+    }
+    .gallery-thumbs .swiper-slide {
+      width: 25%;
+      height: 100%;
+      opacity: 0.4;
+      cursor: pointer;
+      padding: 5px;
+    }
+    .gallery-thumbs .swiper-slide-thumb-active {
+      opacity: 1;
+    }
+    .gallery-thumbs img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
     }
   </style>
 </head>
@@ -370,6 +443,88 @@
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Custom Gallery Script -->
+  <script>
+    const imageMapping = {
+      "Education": ["2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg"],
+      "Festivals": ["7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg"],
+      "Food": ["12.jpg", "13.jpg", "14.jpg", "15.jpg", "16.jpg", "17.jpg"]
+    };
+
+    let mainSwiper, thumbsSwiper;
+
+    document.querySelectorAll('.folder-card').forEach(card => {
+      const folderName = card.querySelector('.folder-name').innerText.trim();
+      if (imageMapping[folderName]) {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => {
+          openGallery(imageMapping[folderName]);
+        });
+      }
+    });
+
+    function openGallery(images) {
+      const modal = document.getElementById('customGalleryModal');
+      const mainWrapper = document.getElementById('galleryMainWrapper');
+      const thumbsWrapper = document.getElementById('galleryThumbsWrapper');
+
+      mainWrapper.innerHTML = '';
+      thumbsWrapper.innerHTML = '';
+
+      images.forEach(img => {
+        mainWrapper.innerHTML += `<div class="swiper-slide"><img src="assets/more_images/${img}" alt=""></div>`;
+        thumbsWrapper.innerHTML += `<div class="swiper-slide"><img src="assets/more_images/${img}" alt=""></div>`;
+      });
+
+      modal.style.display = 'flex';
+
+      if (thumbsSwiper) thumbsSwiper.destroy();
+      if (mainSwiper) mainSwiper.destroy();
+
+      thumbsSwiper = new Swiper('.gallery-thumbs', {
+        spaceBetween: 10,
+        slidesPerView: 4,
+        freeMode: true,
+        watchSlidesProgress: true,
+        breakpoints: {
+          640: { slidesPerView: 5 },
+          768: { slidesPerView: 7 }
+        }
+      });
+
+      mainSwiper = new Swiper('.gallery-main', {
+        spaceBetween: 10,
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        thumbs: {
+          swiper: thumbsSwiper
+        }
+      });
+    }
+
+    function closeGallery() {
+      document.getElementById('customGalleryModal').style.display = 'none';
+    }
+  </script>
+
+  <!-- Gallery Modal -->
+  <div id="customGalleryModal" class="custom-gallery-modal">
+    <span class="gallery-close" onclick="closeGallery()">&times;</span>
+    <div class="gallery-container">
+      <div class="swiper gallery-main">
+        <div class="swiper-wrapper" id="galleryMainWrapper"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+      </div>
+      <div class="swiper gallery-thumbs">
+        <div class="swiper-wrapper" id="galleryThumbsWrapper"></div>
+      </div>
+    </div>
+  </div>
 
 </body>
 
